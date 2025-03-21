@@ -1,0 +1,88 @@
+
+name: Trigger Automation
+
+on:
+  workflow_dispatch:
+    inputs:
+      OsmosSellerUrl:
+        description: 'HyperLocalSellerUrl'
+        required: false
+        default: 'https://hyperlocal-demo.onlinesales.ai/'
+      OsmosPulseUrl:
+        description: 'HyperLocalPulseUrl'
+        required: false
+        default: 'https://hyperlocal-demo-pulse.onlinesales.ai/'
+      xml-suite:
+        description: 'Select XML Suite to Run'
+        required: true
+        type: choice
+        options:
+          - 'HyperAll.xml'
+          - 'test.xml'
+          
+
+jobs:
+  ui-automation:
+    runs-on: ubuntu-latest
+
+    services:
+      xvfb:
+        image: docker.io/selenium/standalone-chrome:latest
+        options: >-
+          --shm-size 2g
+          --name xvfb
+          --label testing
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'adopt'
+          java-version: '11'
+
+      - name: Install Maven
+        run: sudo apt-get install -y maven
+
+      - name: Install Allure
+        run: |
+          curl -o allure-2.13.8.tgz -OLs https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.13.8/allure-commandline-2.13.8.tgz
+          sudo tar -zxvf allure-2.13.8.tgz -C /opt/
+          sudo ln -s /opt/allure-2.13.8/bin/allure /usr/bin/allure
+
+      - name: Start Xvfb
+        run: |
+          Xvfb :99 -screen 0 1920x1080x24 &
+
+      - name: Run UI tests
+        run: |
+         mvn clean test -DxmlFile="${{ github.event.inputs.xml-suite }}" -DHyperLocalSellerUrl="${{ github.event.inputs.HyperLocalSellerUrl }}" -DHyperLocalPulseUrl="${{ github.event.inputs.HyperLocalPulseUrl }}" 
+          export DISPLAY=:99
+
+          
+      - name: Publish Allure results
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: allure-results
+
+
+
+      # - name: Configure AWS Credentials
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: ${{ secrets.AWS_REGION }}
+
+      # - name: Taking History folder from the previous report
+      #   run: aws s3 sync s3://${{ secrets.AWS_PRODUCTION_BUCKET_NAME }}/qa-automation-reports/latest/history allure-results/history
+
+      # - name: Generate Allure Report
+      #   run: |
+      #     allure generate allure-results --clean -o allure-report
+
+      # - name: Deploy to S3 bucket
+      #   run: aws s3 sync allure-report s3://${{ secrets.AWS_PRODUCTION_BUCKET_NAME }}/qa-automation-reports/latest --delete
