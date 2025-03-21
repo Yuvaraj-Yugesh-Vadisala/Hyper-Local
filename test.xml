@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Regression_Test_Suite_Master">
+    <listeners>
+        <listener class-name="EventListeners.AllureScreenShot"/>
+    </listeners>
+    <test verbose="2" preserve-order="true" name="Hyper_Local" thread-count="7" parallel="classes">
+        <classes>
+            <class name="TestSeller.Dashboard">
+                <methods>
+                    <include name="ValidateAllPerformanceDashboardOperations"/>
+                    <include name="ValidateAllMeninxDashboardOperations"/>
+                    <include name="SettingsOperations"/>
+                    <include name="SupportOperations"/>
+                </methods>
+            </class>
+            <class name="TestSeller.LMS">
+                <methods>
+                    <include name="ModifyLMSData"/>
+                </methods>
+            </class>
+            <class name="TestSeller.Meninx">
+                <methods>
+                    <include name="GooglePostCreationWithWhatsNew"/>
+                    <include name="GooglePostCreationWithEvents"/>
+                    <include name="GooglePostCreationWithOffer"/>
+                    <include name="FacebookPostCreationWithWhatsNew"/>
+                    <include name="FacebookPostCreationWithMultipleImages"/>
+                </methods>
+            </class>
+            <class name="TestSeller.Performance">
+                <methods>
+                    <include name="CreatePerformanceCampaignWithGooglePositive"/>
+                    <include name="CreatePerformanceCampaignWithGoogleNegative"/>
+                    <include name="CreatePerformanceCampaignWithFacebook"/>
+                    <include name="ValidateAllFieldsWhileCreatePerformanceCampaignWithFacebook"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+</suite>
