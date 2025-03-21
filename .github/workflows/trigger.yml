@@ -4,11 +4,11 @@ name: Trigger Automation
 on:
   workflow_dispatch:
     inputs:
-      OsmosSellerUrl:
+      HyperLocalSellerUrl:
         description: 'HyperLocalSellerUrl'
         required: false
         default: 'https://hyperlocal-demo.onlinesales.ai/'
-      OsmosPulseUrl:
+      HyperLocalPulseUrl:
         description: 'HyperLocalPulseUrl'
         required: false
         default: 'https://hyperlocal-demo-pulse.onlinesales.ai/'
